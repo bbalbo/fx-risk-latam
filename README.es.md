@@ -3,8 +3,8 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Pandas](https://img.shields.io/badge/pandas-2.0%2B-150458)
 ![NumPy](https://img.shields.io/badge/numpy-1.26%2B-013243)
-![Licencia](https://img.shields.io/badge/licencia-sin%20especificar-lightgrey)
 ![Estado](https://img.shields.io/badge/estado-activo-success)
+![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial-blue)
 
 > 🇬🇧 Looking for the English version? Read **[README.md](README.md)**.
 
