@@ -5,6 +5,7 @@
 ![NumPy](https://img.shields.io/badge/numpy-1.26%2B-013243)
 ![License](https://img.shields.io/badge/license-unspecified-lightgrey)
 ![Status](https://img.shields.io/badge/status-active-success)
+![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial-blue)
 
 > 🇪🇸 ¿Buscas la versión en español? Lee **[README.es.md](README.es.md)**.
 
