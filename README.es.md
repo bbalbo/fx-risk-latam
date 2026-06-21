@@ -221,7 +221,7 @@ Todos los datos provienen de la [API de Frankfurter](https://frankfurter.dev/) �
 
 ## Licencia
 
-Actualmente este repositorio no incluye un archivo de licencia — todos los derechos reservados por defecto. Si planeas compartir o abrir el proyecto como open source, considera agregar un archivo `LICENSE` (por ejemplo MIT o Apache 2.0).
+Este proyecto está licenciado bajo [PolyForm Noncommercial 1.0.0](LICENSE) — de uso libre para fines personales, educativos y no comerciales. El uso comercial requiere permiso del autor.
 
 ---
 
