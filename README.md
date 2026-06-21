@@ -221,7 +221,7 @@ All data comes from the [Frankfurter API](https://frankfurter.dev/) — a free, 
 
 ## License
 
-No license file is currently included in this repository — all rights reserved by default. If you intend to share or open-source this project, consider adding a `LICENSE` file (e.g. MIT or Apache 2.0).
+This project is licensed under [PolyForm Noncommercial 1.0.0](LICENSE) — free for personal, educational, and noncommercial use. Commercial use requires permission from the author.
 
 ---
 
