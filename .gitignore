@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Virtual environments / Entornos virtuales
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data — the database is generated locally, not committed.
+# Los datos se generan localmente, no se suben al repositorio.
+data/
+
+# OS
+.DS_Store
+Thumbs.db
