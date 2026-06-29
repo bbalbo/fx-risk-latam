@@ -15,9 +15,10 @@ env/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data — the database is generated locally, not committed.
-# Los datos se generan localmente, no se suben al repositorio.
-data/
+# Data — committed for Streamlit Cloud deployment.
+# Refresh monthly: python -m src.extraction && git add data/fx_data.db && git push
+data/*.csv
+data/*.log
 
 # OS
 .DS_Store
