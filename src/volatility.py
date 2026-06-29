@@ -16,10 +16,14 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 # Standard window sizes in market risk analysis.
-# Ventanas estandar en analisis de riesgo de mercado.
-WINDOW_30D  = 30    # short-term stress indicator / indicador de estres de corto plazo
-WINDOW_90D  = 90    # medium-term trend / tendencia de mediano plazo
-WINDOW_252D = 252   # one trading year / un anio de trading
+WINDOW_30D  = 30
+WINDOW_90D  = 90
+WINDOW_252D = 252
+
+# RiskMetrics decay factor (Brooks §8.5). λ=0.94 is the industry standard
+# for daily data: recent observations carry more weight, older ones decay
+# exponentially. Avoids the 'ghost effect' of simple rolling windows.
+EWMA_LAMBDA = 0.94
 
 
 def rolling_volatility(returns: pd.DataFrame, window: int = WINDOW_30D, annualize: bool = True) -> pd.DataFrame:
@@ -49,6 +53,32 @@ def rolling_volatility(returns: pd.DataFrame, window: int = WINDOW_30D, annualiz
         vol = vol * np.sqrt(252)
 
     logger.info("Rolling volatility computed: window=%dd, annualized=%s", window, annualize)
+    return vol
+
+
+def ewma_volatility(returns: pd.DataFrame, lam: float = EWMA_LAMBDA, annualize: bool = True) -> pd.DataFrame:
+    """
+    EWMA volatility (RiskMetrics model, Brooks §8.5).
+    σ²_t = λ·σ²_{t-1} + (1-λ)·r²_{t-1}
+
+    Advantages over rolling window:
+    - Recent observations carry more weight (alpha = 1 - lambda)
+    - No 'ghost effect': shocks decay smoothly rather than dropping abruptly
+    - λ=0.94 is the RiskMetrics industry standard for daily data
+
+    Example / Ejemplo:
+        >>> import pandas as pd, numpy as np
+        >>> np.random.seed(0)
+        >>> r = pd.DataFrame({"CLP": np.random.normal(0, 0.005, 300)})
+        >>> vol = ewma_volatility(r)
+        >>> vol["CLP"].isna().sum()
+        0
+    """
+    alpha = 1 - lam
+    vol = returns.ewm(alpha=alpha, adjust=False).std()
+    if annualize:
+        vol = vol * np.sqrt(252)
+    logger.info("EWMA volatility computed: lambda=%.2f, annualized=%s", lam, annualize)
     return vol
 
 

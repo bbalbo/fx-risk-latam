@@ -22,3 +22,6 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+# Reference material — not part of the codebase
+*.pdf
