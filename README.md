@@ -1,111 +1,123 @@
 # FX Risk LatAm
 
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Streamlit](https://img.shields.io/badge/streamlit-1.35%2B-FF4B4B)
 ![Pandas](https://img.shields.io/badge/pandas-2.0%2B-150458)
-![NumPy](https://img.shields.io/badge/numpy-1.26%2B-013243)
-![Status](https://img.shields.io/badge/status-active-success)
-![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial-blue)
+![Status](https://img.shields.io/badge/estado-activo-success)
+![License](https://img.shields.io/badge/licencia-PolyForm%20Noncommercial-blue)
 
-> 🇪🇸 ¿Buscas la versión en español? Lee **[README.es.md](README.es.md)**.
+> 🇬🇧 Looking for the English version? See **[README.en.md](README.en.md)**.
 
-A quantitative market-risk toolkit for Latin American currencies. It pulls daily FX data, computes returns, volatility, correlation, Value at Risk, stress scenarios, and statistical anomalies — the same building blocks used in institutional FX risk desks, distilled into a small, readable Python codebase.
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Why this project](#why-this-project)
-- [Currencies covered](#currencies-covered)
-- [Project structure](#project-structure)
-- [Installation](#installation)
-- [Quick start](#quick-start)
-- [Module reference](#module-reference)
-- [Methodology notes](#methodology-notes)
-- [Data source](#data-source)
-- [Roadmap ideas](#roadmap-ideas)
-- [License](#license)
+Panel de análisis cuantitativo de riesgo cambiario para monedas latinoamericanas. Extrae datos diarios de tipo de cambio, calcula retornos, volatilidad, correlación, Valor en Riesgo, escenarios de estrés y anomalías estadísticas — todo expuesto a través de un dashboard interactivo construido en Streamlit.
 
 ---
 
-## Overview
+## Tabla de contenidos
 
-**FX Risk LatAm** answers a simple question for a regional currency book: *how risky is this exposure, and how risky was it during a crisis?*
+- [Descripción general](#descripción-general)
+- [Por qué este proyecto](#por-qué-este-proyecto)
+- [Monedas incluidas](#monedas-incluidas)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Instalación](#instalación)
+- [Inicio rápido](#inicio-rápido)
+- [Dashboard](#dashboard)
+- [Referencia de módulos](#referencia-de-módulos)
+- [Notas metodológicas](#notas-metodológicas)
+- [Fuente de datos](#fuente-de-datos)
+- [Licencia](#licencia)
 
-The pipeline is:
+---
+
+## Descripción general
+
+**FX Risk LatAm** responde una pregunta concreta para un libro de monedas regional: *¿qué tan riesgosa es esta exposición, y qué tan riesgosa fue durante una crisis?*
+
+El pipeline es:
 
 ```
-Frankfurter API  →  SQLite (raw rates)  →  returns  →  risk metrics
+Frankfurter API  →  SQLite (tasas brutas)  →  retornos  →  métricas de riesgo  →  dashboard
 ```
 
-From there, four standard risk lenses are computed:
+Cuatro lentes de riesgo estándar más detección de anomalías:
 
-| Lens | Question it answers | Module |
+| Lente | Pregunta que responde | Módulo |
 |---|---|---|
-| **Volatility** | How much does this currency move, recently vs. historically? | `volatility.py` |
-| **Value at Risk (VaR) / Expected Shortfall** | What's the worst daily loss I should expect, at a given confidence level? | `var.py` |
-| **Correlation** | Do these currencies move together, or independently? | `correlation.py` |
-| **Stress testing** | What actually happened to this currency during COVID, the 2022 Fed hikes, the 2023 ARS devaluation, or the 2024 JPY carry unwind? | `stress.py` |
-| **Anomaly detection** | Which specific days were statistically extreme, with no prior assumption about the cause? | `anomalies.py` |
+| **Volatilidad** | ¿Cuánto se mueve esta moneda, en el corto vs. largo plazo? | `volatility.py` |
+| **VaR / Expected Shortfall** | ¿Cuál es la peor pérdida diaria esperable a un nivel de confianza dado? | `var.py` |
+| **Correlación** | ¿Estas monedas se mueven juntas o independientemente? | `correlation.py` |
+| **Stress testing** | ¿Qué pasó realmente durante el COVID, las subidas de la Fed, la devaluación ARS o el carry unwind del JPY? | `stress.py` |
+| **Detección de anomalías** | ¿Qué días fueron estadísticamente extremos, sin asumir la causa? | `anomalies.py` |
 
-## Why this project
+---
 
-Most public FX tutorials stop at "plot the exchange rate." This project goes one level deeper, into the kind of analysis a risk desk actually produces:
+## Por qué este proyecto
 
-- **Historical, not parametric, VaR** — LatAm FX returns have fat tails (high kurtosis). A parametric (normal-distribution) VaR model would systematically understate tail risk for currencies like ARS or MXN, so this project uses historical simulation instead.
-- **Event-based stress testing, not just statistics** — VaR summarizes a whole distribution; stress testing isolates specific, nameable events (COVID, Fed hikes, a real devaluation) and reports what actually happened. That's harder to dismiss in front of a risk committee — or in an interview.
-- **Two FX perspectives, not one** — most resources default to a USD-only view. This project builds both a USD-base table and a CLP-base table, so the same data also answers "what does this look like from Chile?"
+La mayoría de tutoriales de FX se detienen en "grafica el tipo de cambio". Este proyecto va un nivel más profundo:
 
-## Currencies covered
+- **VaR histórico, no paramétrico** — los retornos de FX en LatAm tienen colas pesadas (alta curtosis). Un modelo VaR normal subestimaría sistemáticamente el riesgo de cola en monedas como ARS o MXN.
+- **Stress testing basado en eventos** — el VaR resume una distribución completa; el stress testing aísla eventos específicos y reales. Un resultado así es más difícil de ignorar frente a un comité de riesgo.
+- **EWMA vs. volatilidad rolling** — se implementan ambos modelos para mostrar la diferencia práctica: el modelo rolling tiene "efecto fantasma"; el EWMA de RiskMetrics (λ=0.94) lo suaviza con decay exponencial.
+- **Dos perspectivas cambiarias** — tabla base USD y base CLP, cubriendo también la perspectiva del gestor local chileno.
 
-**Core LatAm (7):**
+---
 
-| Code | Currency |
+## Monedas incluidas
+
+**LatAm core (7):**
+
+| Código | Moneda |
 |---|---|
-| CLP | Chilean peso |
-| BRL | Brazilian real |
-| ARS | Argentine peso |
-| MXN | Mexican peso |
-| COP | Colombian peso |
-| PEN | Peruvian sol |
-| VES | Venezuelan bolívar soberano |
+| CLP | Peso chileno |
+| BRL | Real brasileño |
+| ARS | Peso argentino |
+| MXN | Peso mexicano |
+| COP | Peso colombiano |
+| PEN | Sol peruano |
+| VES | Bolívar venezolano soberano |
 
-**Reference currencies (3)** — included for specific analytical reasons:
+**Referencias globales (3):**
 
-| Code | Currency | Reason |
+| Código | Moneda | Razón |
 |---|---|---|
-| EUR | Euro | Global benchmark |
-| CNY | Chinese yuan | Chile's largest trading partner |
-| JPY | Japanese yen | Classic safe-haven currency |
+| EUR | Euro | Benchmark global |
+| CNY | Yuan chino | Principal socio comercial de Chile |
+| JPY | Yen japonés | Moneda refugio clásica |
 
-**Plus gold (XAU)** as a non-fiat reference asset, expressed both in USD and in CLP.
+**Más oro (XAU)** como referencia no fiduciaria, expresado en USD y en CLP.
 
-> **Note on date range:** all series start on **2018-05-29**, the date the Venezuelan *bolívar soberano* (VES) was introduced. This is a deliberate design choice — cutting every series to a common start avoids mixing real data gaps with the structural absence of VES data before that date. Data is actually pulled from 2015 internally so that forward-fill has prior values to work with right at that boundary.
+> **Nota sobre rango de fechas:** todas las series comienzan el **2018-05-29**, fecha de introducción del bolívar soberano venezolano (VES). Internamente se extrae desde 2015 para que el forward-fill tenga valores previos disponibles en ese borde.
 
-## Project structure
+---
+
+## Estructura del proyecto
 
 ```
 fx-risk-latam/
+├── app.py                    # Dashboard interactivo (Streamlit)
 ├── requirements.txt
-├── README.md                # this file
-├── README.es.md              # Spanish version
-├── data/                     # generated locally, not committed (see .gitignore)
+├── README.md                 # Este archivo (español)
+├── README.en.md              # Versión en inglés
+├── .streamlit/
+│   └── config.toml           # Tema: monospace, fondo blanco, sidebar oscuro
+├── data/                     # Generado localmente, no committed
 │   └── fx_data.db
 └── src/
     ├── __init__.py
-    ├── config.py              # currencies, date ranges, paths — single source of truth
-    ├── extraction.py          # pulls data from Frankfurter API → SQLite
-    ├── returns.py              # simple & log returns, summary statistics
-    ├── volatility.py           # rolling annualized volatility (30d / 90d / 252d)
-    ├── var.py                  # historical VaR + Expected Shortfall
-    ├── correlation.py          # static & rolling correlation matrices
-    ├── stress.py                # historical crisis scenario testing
-    └── anomalies.py             # rolling z-score extreme-move detection
+    ├── config.py             # Monedas, fechas, rutas
+    ├── extraction.py         # Frankfurter API → SQLite
+    ├── returns.py            # Retornos simples y log, estadísticas
+    ├── volatility.py         # Volatilidad rolling y EWMA (RiskMetrics)
+    ├── var.py                # VaR histórico + Expected Shortfall
+    ├── correlation.py        # Correlación estática y móvil
+    ├── stress.py             # Escenarios de estrés histórico
+    └── anomalies.py          # Detección de movimientos extremos por z-score
 ```
 
-## Installation
+---
 
-Requires **Python 3.10+** (the codebase uses `dict[str, tuple[str, str]]`-style type hints).
+## Instalación
+
+Requiere **Python 3.10+**.
 
 ```bash
 git clone https://github.com/bbalbo/fx-risk-latam.git
@@ -115,114 +127,140 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Dependencies are intentionally minimal:
+Dependencias:
 
-| Package | Purpose |
+| Paquete | Uso |
 |---|---|
-| `requests` | calls the Frankfurter API |
-| `pandas` | tabular data, returns, rolling windows |
-| `numpy` | log returns, annualization math |
+| `requests` | Llamadas a la Frankfurter API |
+| `pandas` | Datos tabulares, retornos, ventanas móviles |
+| `numpy` | Retornos log, anualización |
+| `streamlit` | Dashboard interactivo |
+| `plotly` | Gráficos interactivos |
+| `scipy` | KDE, distribuciones teóricas, Q-Q plot |
+| `statsmodels` | Línea de tendencia OLS en scatter |
 
-No API key is required — [Frankfurter](https://frankfurter.dev/) is a free, open exchange-rate API with daily data going back to 1948.
+No se requiere API key — [Frankfurter](https://frankfurter.dev/) es gratuita y abierta.
 
-## Quick start
+---
 
-**1. Pull and store the data** (run once, or whenever you want fresh data):
+## Inicio rápido
+
+**1. Extraer los datos** (una vez, o cuando se quieran datos frescos):
 
 ```bash
 python -m src.extraction
 ```
 
-This builds two local SQLite tables in `data/fx_data.db`:
-- `fx_rates_usd` — all currencies vs. USD (Table A)
-- `fx_rates_clp` — all currencies vs. CLP, the Chilean perspective (Table B)
+Genera dos tablas en `data/fx_data.db`: `fx_rates_usd` y `fx_rates_clp`.
 
-**2. Run any analysis module directly:**
+**2. Lanzar el dashboard:**
 
 ```bash
-python -m src.returns        # return summary (mean, vol, skew, kurtosis)
-python -m src.volatility     # 30d / 90d / 252d annualized volatility
-python -m src.var            # VaR & Expected Shortfall at 90/95/99% confidence
-python -m src.correlation    # full-period + rolling correlation vs. CLP
-python -m src.stress         # cumulative return during 4 historical crises
-python -m src.anomalies      # top 20 most extreme single-day moves
+streamlit run app.py
 ```
 
-**3. Or use it as a library:**
+**3. O ejecutar módulos directamente:**
+
+```bash
+python -m src.returns
+python -m src.volatility
+python -m src.var
+python -m src.correlation
+python -m src.stress
+python -m src.anomalies
+```
+
+**4. O como librería:**
 
 ```python
 from src.returns import load_rates, log_returns
 from src.var import var_summary
-from src.stress import full_stress_table
 
 rates   = load_rates()
 returns = log_returns(rates)
-
 print(var_summary(returns))
-print(full_stress_table(returns))
 ```
-
-Every public function ships with a runnable docstring example (`>>>`), so you can also sanity-check behavior with `python -m doctest src/var.py -v` (or any other module).
-
-## Module reference
-
-### `config.py`
-Single source of truth for currency lists, date boundaries, and the SQLite path. Changing the analysis universe (e.g. adding a currency) means editing one file, not hunting through extraction logic.
-
-### `extraction.py`
-Fetches daily rates from Frankfurter, pivots them into a wide table (dates × currencies), and forward-fills weekend/holiday gaps so the series is continuous. Validates that zero `NaN`s remain before saving — if any do, it raises rather than silently saving incomplete data.
-
-### `returns.py`
-Computes both simple returns (`P_t / P_{t-1} - 1`) and log returns (`ln(P_t / P_{t-1})`). Log returns are used everywhere downstream because they're time-additive and better-behaved statistically. Also computes `return_summary()`: mean, std, annualized vol, min, max, skew, kurtosis — kurtosis specifically motivates the historical (not parametric) VaR choice later.
-
-### `volatility.py`
-Rolling standard deviation of log returns, annualized with the standard `√252` trading-day convention. Three window sizes are standard in market risk: 30d (short-term stress), 90d (medium-term trend), 252d (one trading year). Comparing 30d vs. 252d volatility tells you whether a currency is *currently* unusually calm or unusually stressed relative to its own history.
-
-### `var.py`
-**Historical simulation** VaR and Expected Shortfall (ES/CVaR) at 90%, 95%, and 99% confidence. Historical simulation is used deliberately instead of a parametric (normal) model, because LatAm FX returns exhibit fat tails — a normal-distribution assumption would understate real tail risk. ES, adopted by Basel III as the primary tail-risk measure in 2016, captures the *severity* of losses beyond the VaR cutoff, not just the cutoff itself.
-
-### `correlation.py`
-Computes correlation **on returns, not price levels** — price levels share common trends that artificially inflate correlation. Supports both a full-period snapshot and a rolling correlation against a chosen base currency, useful for spotting regime shifts (e.g., did CLP and BRL become more correlated during a commodity cycle?).
-
-### `stress.py`
-Runs four predefined historical stress scenarios and reports the cumulative log return per currency during each:
-
-| Scenario | Window |
-|---|---|
-| COVID-19 crash | Feb 20 – Mar 31, 2020 |
-| Fed rate hikes | Jun 1 – Oct 31, 2022 |
-| ARS devaluation (Milei) | Dec 11 – Dec 15, 2023 |
-| JPY carry unwind | Aug 1 – Aug 9, 2024 |
-
-Unlike VaR, which summarizes a whole distribution, this isolates *named, real events* — a result that's far harder to wave away than a statistical percentile.
-
-### `anomalies.py`
-Flags individual days where a currency's return deviates more than a threshold (default ±3σ) from its own 30-day rolling mean/std. This is complementary to stress testing: stress testing starts from a known event and asks what happened; anomaly detection starts from the data and asks which days were extreme, with no prior knowledge of the cause.
-
-## Methodology notes
-
-- **Returns convention**: all rates are expressed as *units of local currency per 1 USD* (Table A) or *per 1 CLP* (Table B). A **positive** return therefore means the currency **depreciated** (it takes more local currency to buy one USD).
-- **252 trading days/year** is the standard annualization convention in market risk — used consistently across `volatility.py` and `returns.py`.
-- **VaR sign convention**: VaR and ES are reported as **negative** numbers (they represent losses). ES is always ≤ VaR (a more negative, i.e. larger, loss).
-- **Why cut the start date to 2018-05-29 but pull from 2015?** VES didn't exist before May 2018. Pulling from 2015 gives `ffill()` real prior values to draw on right at that boundary, instead of producing artifacts at the edge of the series.
-
-## Data source
-
-All data comes from the [Frankfurter API](https://frankfurter.dev/) — a free, open-source, no-API-key exchange rate service built on European Central Bank reference rates (and gold spot data), with daily history back to 1948.
-
-## Roadmap ideas
-
-- [ ] Add a `LICENSE` file
-- [ ] CLI entry point (`fx-risk extract`, `fx-risk var --confidence 0.99`)
-- [ ] Parametric (variance-covariance) VaR as a comparison baseline
-- [ ] Lightweight plotting helpers (volatility term structure, rolling correlation heatmap)
-- [ ] GitHub Actions workflow to refresh `data/fx_data.db` on a schedule
-- [ ] Unit test suite beyond doctests (`pytest`)
-
-## License
-
-This project is licensed under [PolyForm Noncommercial 1.0.0](LICENSE) — free for personal, educational, and noncommercial use. Commercial use requires permission from the author.
 
 ---
 
-<p align="center">Built for understanding how Latin American currencies actually behave under stress — not just how they trend.</p>
+## Dashboard
+
+El dashboard tiene 6 páginas accesibles desde el sidebar:
+
+### Panorama Regional
+Tabla resumen de todos los activos (retorno medio, volatilidad anualizada, curtosis), tipo de cambio normalizado (base 100 o valores absolutos), violin plots comparando la distribución de retornos por moneda, mapa de calor de retornos mensuales (años × meses, verde=apreciación / rojo=depreciación), y serie de retornos al cuadrado como evidencia de volatility clustering.
+
+### Volatilidad
+Volatilidad rolling (30d / 90d / 252d) o EWMA (λ=0.94). KDE ridge plot comparando la distribución histórica de volatilidad por moneda. Comparación directa Rolling vs. EWMA con panel de diferencia. Señal de estrés (ratio vol 30d / vol 252d). Autocorrelación de r² como test de efectos ARCH.
+
+### Correlaciones
+Heatmap de correlación Pearson o Spearman. Joint plot con distribuciones marginales y línea OLS. Scatter matrix (pairplot) para subconjunto seleccionado. Correlación móvil vs. CLP.
+
+### VaR & Riesgo de Cola
+VaR histórico y Expected Shortfall al 90/95/99%. Distribución empírica vs. normal teórica con líneas de VaR y ES. Q-Q Plot para visualizar directamente la desviación de la normalidad en las colas.
+
+### Stress Testing
+Mapa de calor de retornos acumulados (escenario × moneda). Lollipop chart por escenario (verde=apreciación, rojo=depreciación).
+
+| Escenario | Período |
+|---|---|
+| COVID-19 crash | 20 Feb – 31 Mar 2020 |
+| Fed rate hikes | 1 Jun – 31 Oct 2022 |
+| Devaluación ARS (Milei) | 11 – 15 Dic 2023 |
+| JPY carry unwind | 1 – 9 Ago 2024 |
+
+### Anomalías
+Timeline de eventos extremos (tamaño del punto proporcional al z-score), mapa de calor mensual de frecuencia de anomalías por moneda, conteo observado vs. esperado bajo normalidad, tabla de los 30 eventos más extremos y distribución de z-scores.
+
+---
+
+## Referencia de módulos
+
+### `config.py`
+Fuente única de verdad: lista de monedas, fechas de inicio, rutas de SQLite. Agregar una moneda o cambiar el rango de fechas requiere tocar solo este archivo.
+
+### `extraction.py`
+Extrae tasas desde Frankfurter API, pivota a formato ancho (fechas × monedas), forward-fill de huecos de fin de semana y feriados. Valida que no quede ningún `NaN` antes de guardar — si queda alguno, lanza en lugar de guardar datos incompletos silenciosamente.
+
+### `returns.py`
+Retornos simples y logarítmicos. Los retornos log se usan en todo el análisis posterior por ser aditivos en el tiempo: `Σr_t = ln(p_T/p_0)`. `return_summary()` incluye curtosis, que motiva el uso de VaR histórico en lugar de paramétrico.
+
+### `volatility.py`
+Volatilidad rolling anualizada (`×√252`) y EWMA (RiskMetrics). El EWMA implementa `σ²_t = λ·σ²_{t-1} + (1-λ)·r²_{t-1}` con λ=0.94 — sin efecto fantasma, con decay exponencial de shocks pasados.
+
+### `var.py`
+Simulación histórica de VaR y Expected Shortfall (ES/CVaR) al 90/95/99%. El ES, adoptado en Basilea III como medida primaria de riesgo de cola, captura la severidad de las pérdidas más allá del umbral del VaR.
+
+### `correlation.py`
+Correlación calculada sobre retornos (no niveles de precio). Los niveles comparten tendencias comunes que inflan artificialmente la correlación. Soporta snapshot completo y correlación móvil contra moneda base.
+
+### `stress.py`
+Cuatro escenarios de estrés histórico predefinidos. Los retornos log acumulados son la métrica correcta por aditividad temporal.
+
+### `anomalies.py`
+Z-score móvil (ventana 30d). Detecta días donde `|z_t| > umbral` respecto a la distribución local de cada moneda. Complementario al stress testing: parte de los datos, no de un evento conocido.
+
+---
+
+## Notas metodológicas
+
+- **Convención de tasas**: tasas expresadas como *unidades de moneda local por 1 USD*. Retorno positivo = la moneda se depreció.
+- **252 días/año**: convención estándar de anualización en riesgo de mercado.
+- **Signo del VaR**: VaR y ES se reportan como números negativos (pérdidas). ES siempre ≤ VaR en valor absoluto.
+- **Curtosis de referencia**: distribución normal = 3. Valores superiores indican fat tails.
+
+---
+
+## Fuente de datos
+
+[Frankfurter API](https://frankfurter.dev/) — gratuita, sin API key, basada en tasas de referencia del BCE, con historia diaria desde 1948.
+
+---
+
+## Licencia
+
+[PolyForm Noncommercial 1.0.0](LICENSE) — libre para uso personal, educativo y no comercial. Uso comercial requiere autorización del autor.
+
+---
+
+<p align="center">Construido para entender cómo se comportan realmente las monedas latinoamericanas bajo estrés.</p>
