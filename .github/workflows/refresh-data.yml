@@ -1,0 +1,43 @@
+name: Refresh FX data
+
+# Actualiza data/fx_data.db con datos frescos de la Frankfurter API.
+# Los runners de GitHub sí tienen acceso a internet, así que el refresh
+# corre en la nube y se commitea solo. Se puede disparar a mano desde la
+# pestaña Actions (workflow_dispatch) o esperar al schedule mensual.
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"   # día 1 de cada mes, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Extraer datos frescos (Frankfurter -> SQLite)
+        run: python -m src.extraction
+
+      - name: Commitear si hay cambios
+        run: |
+          git config user.name "Bernard Balbontín"
+          git config user.email "107295900+bbalbo@users.noreply.github.com"
+          git add data/fx_data.db
+          if git diff --cached --quiet; then
+            echo "Sin cambios en los datos."
+          else
+            git commit -m "data: refresh $(date -u +%Y-%m-%d)"
+            git push
+          fi
